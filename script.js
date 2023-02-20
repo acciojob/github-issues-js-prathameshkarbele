@@ -1,38 +1,37 @@
 //your code here
-const perPage = 5;
+const issuesList = document.getElementById("issuesList");
+const loadNextBtn = document.getElementById("load_next");
+const loadPrevBtn = document.getElementById("load_prev");
+
 let currentPage = 1;
 
-// Function to fetch and display issues for a given page number
-async function fetchIssues(page) {
-  const url = `https://api.github.com/repositories/1296269/issues?page=${page}&per_page=${perPage}`;
-  const response = await fetch(url);
-  const data = await response.json();
-  const issuesList = document.getElementById('issues-list');
-  issuesList.innerHTML = ''; // Clear previous issues
-  for (let i = 0; i < data.length; i++) {
-    const issue = data[i];
-    const issueName = issue.title;
-    const listItem = document.createElement('li');
-    listItem.textContent = issueName;
-    issuesList.appendChild(listItem);
-  }
+function fetchIssues(pageNumber) {
+  const url = `https://api.github.com/repositories/1296269/issues?page=${pageNumber}&per_page=5`;
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      issuesList.innerHTML = "";
+      data.forEach(issue => {
+        const li = document.createElement("li");
+        li.innerText = issue.title;
+        issuesList.appendChild(li);
+      });
+    })
+    .catch(error => console.log(error));
 }
 
-// Initial load of page 1 issues
 fetchIssues(currentPage);
 
-// Event listener for loading next page of issues
-document.getElementById('load-next').addEventListener('click', async () => {
+loadNextBtn.addEventListener("click", () => {
   currentPage++;
-  document.getElementById('page-number').textContent = currentPage;
-  await fetchIssues(currentPage);
+  document.querySelector("h1").innerHTML = `Page number ${currentPage}`;
+  fetchIssues(currentPage);
 });
 
-// Event listener for loading previous page of issues
-document.getElementById('load-prev').addEventListener('click', async () => {
+loadPrevBtn.addEventListener("click", () => {
   if (currentPage > 1) {
     currentPage--;
-    document.getElementById('page-number').textContent = currentPage;
-    await fetchIssues(currentPage);
+    document.querySelector("h1").innerHTML = `Page number ${currentPage}`;
+    fetchIssues(currentPage);
   }
 });
